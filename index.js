@@ -5,27 +5,27 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// İNATÇI TARAYICILAR İÇİN DOĞRUDAN AÇIK HIZLI STANDART DİKEY TEST VİDEOLARI
+// ASLA ENGELENMEYEN VE SİYAH EKRANDA KALMAYAN YOUTUBE SHORTS HAVUZU
 const REELS_POOL = [
     {
-        video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        youtube_id: 'tPe8bOOn0aE', // Değişik eğlenceli dikey videolar
+        username: 'kesif_zamani',
+        caption: 'Bu manzaraya karşı kiminle olmak isterdin? 🏔️✨ #shorts #travel'
+    },
+    {
+        youtube_url: '9YfFv9S63b4',
         username: 'oyuncu_osman',
-        caption: 'Siber şehirde harika bir akşam! 🎮🔥 #cyberpunk #neon'
+        caption: 'Geleceğin teknolojisi şimdiden hazır! 🎮🔥 #cyberpunk #gaming'
     },
     {
-        video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-        username: 'dogasever',
-        caption: 'Doğanın muhteşem renkleri ve huzur 🌲✨ #nature #shorts'
+        youtube_id: '3_gA_rre7Yg',
+        username: 'lezzet_duragi',
+        caption: 'Hızlı ve pratik efsane tarif! 🥞☕️ #food #cooking'
     },
     {
-        video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-        username: 'lezzet_dunyasi',
-        caption: 'Güne kahve içmeden başlayamayanlar? ☕️🥞 #coffee #morning'
-    },
-    {
-        video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-        username: 'gezgin_rotasi',
-        caption: 'Dalgaların yukarıdan muhteşem görünüşü ☁️⛰️ #travel #reels'
+        youtube_id: 'jNQXAC9IVRw',
+        username: 'teknoloji_merkezi',
+        caption: 'Kurulumu tamamladık, sizce nasıl olmuş? 💻🔥 #setup #pc'
     }
 ];
 
@@ -41,5 +41,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Sunucu aktif! OsGram ayakta.`);
+    console.log(`Sunucu aktif! OsGram YouTube Shorts modunda.`);
 });
