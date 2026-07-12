@@ -9,38 +9,42 @@ async function loadReels() {
     
     try {
         const response = await fetch(`/api/reels?token=${currentToken}`);
-        const data = await response.json();
         
-        const items = data.items || [];
-        currentToken = data.nextToken; // Yeni token'ı hafızaya al
+        // Eğer sunucu 500 veya başka bir hata kodu döndüyse bunu ekrana bas
+        if (!response.ok) {
+            const errorData = await response.json();
+            container.innerHTML = `<p style='color:red; text-align:center; padding:50px;'>Sunucu Hatası: ${errorData.error || response.statusText}</p>`;
+            return;
+        }
 
-        // --- İŞTE BURASI SİHRİ YAPIYOR ---
-        // Eğer bu sayfa boş geldiyse ama sonraki sayfa için token varsa otomatik sonraki sayfayı yükle
+        const data = await response.json();
+        const items = data.items || [];
+        currentToken = data.nextToken;
+
         if (items.length === 0 && currentToken) {
-            isLoading = false; // Kilidi aç
-            loadReels(); // Sonraki sayfaya geç
+            isLoading = false; 
+            loadReels(); 
             return;
         }
 
         if (items.length === 0 && !currentToken) {
-            if(container.children.length === 0) {
+            if(container.children.length === 0 || container.innerHTML.includes('Yükleniyor')) {
                 container.innerHTML = "<p style='color:white; text-align:center; padding-top:50px;'>Hiç video bulunamadı.</p>";
             }
             return;
         }
 
+        // Eğer ilk videolar başarıyla geldiyse "Yükleniyor..." yazısını temizle
+        if (container.innerHTML.includes('Yükleniyor')) {
+            container.innerHTML = '';
+        }
+
         items.forEach(item => {
-            // API'den video linkini bulabilecek tüm alternatif yolları deniyoruz
             const videoUrl = item.video_url || 
                              (item.video_versions && item.video_versions[0]?.url) ||
                              item.video_link;
             
             if (videoUrl) {
-                // Eğer ekranımızda ham veri yazısı kaldıysa onu temizleyelim
-                if(container.innerHTML.includes('{')) {
-                    container.innerHTML = '';
-                }
-
                 const card = document.createElement('div');
                 card.className = 'reels-card';
                 
@@ -52,7 +56,6 @@ async function loadReels() {
                     </div>
                 `;
                 
-                // Tıklayınca oynat/durdur
                 card.querySelector('video').addEventListener('click', function() {
                     if (this.paused) {
                         this.play();
@@ -68,7 +71,8 @@ async function loadReels() {
         initObserver();
 
     } catch (error) {
-        console.error("Reels yüklenirken hata:", error);
+        // İnternet veya tarayıcı kaynaklı bir hata olursa ekrana bas
+        container.innerHTML = `<p style='color:orange; text-align:center; padding-top:50px;'>Bağlantı Hatası: ${error.message}</p>`;
     } finally {
         isLoading = false;
     }
@@ -81,7 +85,6 @@ function initObserver() {
             if (entry.isIntersecting) {
                 entry.target.play().catch(err => console.log("Otomatik oynatma engellendi:", err));
                 
-                // Sonsuz Kaydırma
                 const allCards = document.querySelectorAll('.reels-card');
                 const currentCard = entry.target.parentElement;
                 const index = Array.from(allCards).indexOf(currentCard);
