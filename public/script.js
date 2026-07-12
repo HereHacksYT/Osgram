@@ -18,21 +18,22 @@ async function loadReels() {
                 const card = document.createElement('div');
                 card.className = 'reels-card';
                 
-                // YouTube oynatıcısını sitemize gömüyoruz
-                // playsinline=1 ve videoId playlist olarak eklenince döngüye girer
-                card.innerHTML = `
-                    <div class="iframe-wrapper">
-                        <iframe 
-                            src="https://www.youtube.com/embed/${videoId}?autoplay=0&controls=1&loop=1&playlist=${videoId}&modestbranding=1&rel=0&playsinline=1"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen
-                        ></iframe>
-                    </div>
-                    <div class="reels-overlay">
-                        <h3>@${item.username}</h3>
-                        <p>${item.caption}</p>
-                    </div>
-                `;
+                // script.js içindeki iframe satırını bu şekilde güncelle:
+card.innerHTML = `
+    <div class="iframe-wrapper">
+        <iframe 
+            src="https://www.youtube.com/embed/${videoId}?autoplay=0&controls=1&loop=1&playlist=${videoId}&modestbranding=1&rel=0&playsinline=1"
+            style="width: 100%; height: 100%; border: none;"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen
+        ></iframe>
+    </div>
+    <div class="reels-overlay">
+        <h3>@${item.username}</h3>
+        <p>${item.caption}</p>
+    </div>
+`;
+
 
                 container.appendChild(card);
             }
