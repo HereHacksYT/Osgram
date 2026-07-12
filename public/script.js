@@ -9,17 +9,10 @@ async function loadReels() {
     
     try {
         const response = await fetch(`/api/reels?token=${currentToken}`);
-        
-        // Eğer sunucu 500 veya başka bir hata kodu döndüyse bunu ekrana bas
-        if (!response.ok) {
-            const errorData = await response.json();
-            container.innerHTML = `<p style='color:red; text-align:center; padding:50px;'>Sunucu Hatası: ${errorData.error || response.statusText}</p>`;
-            return;
-        }
-
         const data = await response.json();
+        
         const items = data.items || [];
-        currentToken = data.nextToken;
+        currentToken = data.nextToken; 
 
         if (items.length === 0 && currentToken) {
             isLoading = false; 
@@ -34,16 +27,17 @@ async function loadReels() {
             return;
         }
 
-        // Eğer ilk videolar başarıyla geldiyse "Yükleniyor..." yazısını temizle
         if (container.innerHTML.includes('Yükleniyor')) {
             container.innerHTML = '';
         }
 
         items.forEach(item => {
+            // Yeni API'deki tüm video ihtimallerini kontrol ediyoruz (Reels kontrolü)
             const videoUrl = item.video_url || 
-                             (item.video_versions && item.video_versions[0]?.url) ||
-                             item.video_link;
+                             (item.video_versions && item.video_versions[0]?.url) || 
+                             item.clips_metadata?.video_url;
             
+            // Sadece video olan içerikleri ekrana basıyoruz (Fotoğrafları eliyoruz)
             if (videoUrl) {
                 const card = document.createElement('div');
                 card.className = 'reels-card';
@@ -71,7 +65,6 @@ async function loadReels() {
         initObserver();
 
     } catch (error) {
-        // İnternet veya tarayıcı kaynaklı bir hata olursa ekrana bas
         container.innerHTML = `<p style='color:orange; text-align:center; padding-top:50px;'>Bağlantı Hatası: ${error.message}</p>`;
     } finally {
         isLoading = false;
