@@ -1,26 +1,53 @@
-async function load() {
-    const res = await fetch('/api/get-reels');
-    const videos = await res.json();
-    const cont = document.getElementById('container');
+const feed = document.getElementById("feed");
 
-    videos.forEach(v => {
-        const div = document.createElement('div');
-        div.className = 'card';
-        div.innerHTML = `
-            <video src="${v.url}" loop playsinline muted></video>
-            <div class="info">@${v.user}</div>
-        `;
-        cont.appendChild(div);
-    });
+let loading = false;
 
-    // Otomatik oynatma kuralı
-    document.querySelectorAll('video').forEach(vid => {
-        new IntersectionObserver(entries => {
-            entries.forEach(e => e.isIntersecting ? vid.play() : vid.pause());
-        }, { threshold: 0.6 }).observe(vid);
-        
-        // Tıklayınca ses açma
-        vid.addEventListener('click', () => { vid.muted = !vid.muted; });
-    });
+async function loadVideos() {
+    if (loading) return;
+    loading = true;
+
+    try {
+        const res = await fetch("/api/videos");
+        const videos = await res.json();
+
+        videos.forEach(video => {
+            const id = video.id.videoId;
+
+            const card = document.createElement("div");
+            card.className = "video";
+
+            card.innerHTML = `
+                <iframe
+                    src="https://www.youtube.com/embed/${id}?autoplay=0&mute=1&playsinline=1"
+                    title="${video.snippet.title}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen>
+                </iframe>
+
+                <div class="info">
+                    <h3>${video.snippet.title}</h3>
+                    <p>${video.snippet.channelTitle}</p>
+                </div>
+            `;
+
+            feed.appendChild(card);
+        });
+
+    } catch (err) {
+        console.error(err);
+    }
+
+    loading = false;
 }
-load();
+
+loadVideos();
+
+window.addEventListener("scroll", () => {
+    if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 600
+    ) {
+        loadVideos();
+    }
+});
