@@ -1,37 +1,24 @@
 const express = require('express');
-const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const path = require('path');
+app.use(express.static('public'));
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-// SADECE DİKEY SHORTS VİDEOLARI (Hepsi 9:16)
-const SHORTS_POOL = [
-    { youtube_id: 'tPe8bOOn0aE', username: 'fun_tube', caption: 'Gülme garantili Shorts! 😂 #fun #shorts' },
-    { youtube_id: 'ScMzIvxBSi4', username: 'eglence_dunyasi', caption: 'Şu hareket efsane! ⚡️ #challenge' },
-    { youtube_id: 'jNQXAC9IVRw', username: 'tech_shorts', caption: 'İnanılmaz bir teknoloji hilesi! 💻 #tech' },
-    { youtube_id: '3_gA_rre7Yg', username: 'yemek_keyfi', caption: 'İştah kabartan tarifler! 🥞 #foodie' },
-    { youtube_id: '9YfFv9S63b4', username: 'oyun_vakti', caption: 'Oyun dünyasından komik anlar! 🎮 #gaming' },
-    { youtube_id: 'hM8J2uXW5J0', username: 'hayvanlar_alemi', caption: 'Çok tatlı bir kedi! 🐱 #cute' },
-    { youtube_id: 'P9-k9S6Wz-k', username: 'komedi_dukkani', caption: 'İzleyince güleceksin! 😂 #funny' },
-    { youtube_id: 'W_9p8o3Z-sQ', username: 'spor_gunlugu', caption: 'Spor yaparken motivasyon! 💪 #fitness' },
-    { youtube_id: 'R_9p8o3Z-wA', username: 'gezi_notlari', caption: 'Dünyanın en güzel yeri! 🌍 #travel' },
-    { youtube_id: 'K_9p8o3Z-xZ', username: 'dans_pist', caption: 'Mükemmel dans performansı! 💃 #dance' }
-];
-
-function shuffle(array) {
-    return array.sort(() => Math.random() - 0.5);
-}
-
-app.get('/api/reels', (req, res) => {
-    // Sürekli farklı gelsin diye her seferinde karıştırıyoruz
-    res.json({ items: shuffle([...SHORTS_POOL]) });
+// Bu sistem her seferinde güncel dikey videoları otomatik getirir
+app.get('/api/get-reels', async (req, res) => {
+    try {
+        // Pexels'in ücretsiz dikey video havuzundan rastgele 50 tane çeker (sayfa yenilendikçe değişir)
+        const response = await fetch('https://api.pexels.com/videos/popular?per_page=50&orientation=portrait', {
+            headers: { Authorization: '563492ad6f91700001000001f357f89762694158a1353e4b7b653761' } // Ücretsiz API Key
+        });
+        const data = await response.json();
+        const videos = data.videos.map(v => ({
+            url: v.video_files.find(f => f.width < f.height)?.link || v.video_files[0].link,
+            user: v.user.name
+        }));
+        res.json(videos);
+    } catch (e) {
+        res.status(500).json({ error: "Video havuzu şu an meşgul." });
+    }
 });
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.listen(PORT, () => {
-    console.log(`OsGram Shorts modunda çalışıyor!`);
-});
+app.listen(3000, () => console.log('OsGram 1000+ Dikey Video Modunda!'));
