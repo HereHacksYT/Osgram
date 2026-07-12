@@ -1,80 +1,79 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OsGram - Reels</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            background-color: #000;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .reels-container {
-            width: 100%;
-            max-width: 450px; 
-            height: 100vh;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            scrollbar-width: none; 
-        }
-        .reels-container::-webkit-scrollbar {
-            display: none;
-        }
-        .reels-card {
-            width: 100%;
-            height: 100vh;
-            scroll-snap-align: start;
-            position: relative;
-            background: #000;
-        }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .reels-overlay {
-            position: absolute;
-            bottom: 50px;
-            left: 15px;
-            right: 70px;
-            color: white;
-            text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
-            z-index: 10;
-        }
-        .reels-overlay h3 {
-            font-size: 16px;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        .reels-overlay p {
-            font-size: 14px;
-            line-height: 1.4;
-            opacity: 0.9;
-        }
-        .loading-text {
-            color: white;
-            text-align: center;
-            padding-top: 50px;
-            font-size: 16px;
-        }
-    </style>
-</head>
-<body>
+let isLoading = false;  
 
-    <div class="reels-container">
-        <p class="loading-text">OsGram Reels Yükleniyor...</p>
-    </div>
+async function loadReels() {
+    if (isLoading) return; 
+    isLoading = true;
 
-    <script src="script.js"></script>
-</body>
-</html>
+    const container = document.querySelector('.reels-container');
+    
+    try {
+        const response = await fetch('/api/reels');
+        const data = await response.json();
+        
+        const items = data.items || [];
+
+        if (container.innerHTML.includes('Yükleniyor')) {
+            container.innerHTML = '';
+        }
+
+        items.forEach(item => {
+            if (item.video_url) {
+                const card = document.createElement('div');
+                card.className = 'reels-card';
+                
+                card.innerHTML = `
+                    <video src="${item.video_url}" loop muted playsinline></video>
+                    <div class="reels-overlay">
+                        <h3>@${item.username}</h3>
+                        <p>${item.caption}</p>
+                    </div>
+                `;
+                
+                // Tıklayınca oynat / durdur
+                card.querySelector('video').addEventListener('click', function() {
+                    if (this.paused) {
+                        this.play();
+                    } else {
+                        this.pause();
+                    }
+                });
+
+                container.appendChild(card);
+            }
+        });
+
+        initObserver();
+
+    } catch (error) {
+        console.error("Hata:", error);
+    } {
+        isLoading = false;
+    }
+}
+
+function initObserver() {
+    const videos = document.querySelectorAll('video');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.play().catch(err => console.log("Oynatma engellendi:", err));
+                
+                const allCards = document.querySelectorAll('.reels-card');
+                const currentCard = entry.target.parentElement;
+                const index = Array.from(allCards).indexOf(currentCard);
+                
+                // Son 2 videoya gelince listeyi tekrar yükleyip sonsuz döngü yapıyoruz
+                if (index >= allCards.length - 2) {
+                    loadReels(); 
+                }
+            } else {
+                entry.target.pause();
+                entry.target.currentTime = 0;
+            }
+        });
+    }, { threshold: 0.6 });
+
+    videos.forEach(video => observer.observe(video));
+}
+
+window.addEventListener('DOMContentLoaded', loadReels);
