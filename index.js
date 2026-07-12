@@ -11,7 +11,8 @@ app.get('/api/reels', async (req, res) => {
         const nextToken = req.query.token || ''; 
 
         const encodedParams = new URLSearchParams();
-        encodedParams.set('username_or_url', 'quran');
+        // Kesin Reels videosu çekebilmek için aktif popüler bir hesap veriyoruz
+        encodedParams.set('username_or_url', 'pubgmobile');
         encodedParams.set('amount', '20');
         encodedParams.set('pagination_token', nextToken); 
 
@@ -20,7 +21,6 @@ app.get('/api/reels', async (req, res) => {
             url: 'https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_reels.php',
             headers: {
                 'content-type': 'application/x-www-form-urlencoded',
-                // Baştaki X- harfini büyük/küçük kontrolü için buraya sabitledim
                 'X-RapidAPI-Key': '470a20f40emshd79d5bc169e6302p1afca5jsnec9478b74ac8',
                 'X-RapidAPI-Host': 'instagram-scraper-stable-api.p.rapidapi.com'
             },
@@ -29,16 +29,13 @@ app.get('/api/reels', async (req, res) => {
 
         const response = await axios.request(options);
         
-        // Eğer API'den veri geldiyse direkt gönderiyoruz
-        res.json(response.data); 
+        res.json({
+            items: response.data.data || response.data.items || [],
+            nextToken: response.data.pagination_token || null 
+        }); 
     } catch (error) {
-        // Hata olduğunda sunucu çökmesin, hatayı frontend'e göndersin
         console.error("Sunucu API Hatası:", error.message);
-        res.status(500).json({ 
-            error: "Instagram API baglantisi basarisiz oldu.", 
-            detay: error.message,
-            response: error.response ? error.response.data : "Cevap yok"
-        });
+        res.status(500).json({ error: "Videolar yuklenemedi." });
     }
 });
 
