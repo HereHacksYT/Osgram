@@ -1,24 +1,51 @@
-const express = require('express');
-const app = express();
-const path = require('path');
-app.use(express.static('public'));
+const express = require("express");
+const axios = require("axios");
+const path = require("path");
 
-// Bu sistem her seferinde güncel dikey videoları otomatik getirir
-app.get('/api/get-reels', async (req, res) => {
+const app = express();
+
+const API_KEY = "YOUR_API_KEY";
+
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/api/videos", async (req, res) => {
     try {
-        // Pexels'in ücretsiz dikey video havuzundan rastgele 50 tane çeker (sayfa yenilendikçe değişir)
-        const response = await fetch('https://api.pexels.com/videos/popular?per_page=50&orientation=portrait', {
-            headers: { Authorization: '563492ad6f91700001000001f357f89762694158a1353e4b7b653761' } // Ücretsiz API Key
-        });
-        const data = await response.json();
-        const videos = data.videos.map(v => ({
-            url: v.video_files.find(f => f.width < f.height)?.link || v.video_files[0].link,
-            user: v.user.name
-        }));
-        res.json(videos);
-    } catch (e) {
-        res.status(500).json({ error: "Video havuzu şu an meşgul." });
+        const queries = [
+            "komik shorts",
+            "komik video",
+            "minecraft türkçe",
+            "roblox türkçe",
+            "gta 5 türkçe",
+            "valorant türkçe",
+            "pubg mobile türkçe"
+        ];
+
+        const q = queries[Math.floor(Math.random() * queries.length)];
+
+        const response = await axios.get(
+            "https://www.googleapis.com/youtube/v3/search",
+            {
+                params: {
+                    key: API_KEY,
+                    part: "snippet",
+                    type: "video",
+                    videoEmbeddable: true,
+                    maxResults: 10,
+                    q,
+                    regionCode: "TR",
+                    relevanceLanguage: "tr"
+                }
+            }
+        );
+
+        res.json(response.data.items);
+
+    } catch (err) {
+        console.error(err.response?.data || err.message);
+        res.status(500).json({ error: "YouTube API Error" });
     }
 });
 
-app.listen(3000, () => console.log('OsGram 1000+ Dikey Video Modunda!'));
+app.listen(3000, () => {
+    console.log("Server: http://localhost:3000");
+});
