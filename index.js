@@ -4,10 +4,8 @@ const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// public klasöründeki HTML, CSS ve JS dosyalarını dışarıya açıyoruz
 app.use(express.static(path.join(__dirname, 'public')));
 
-// İnternetten gelen token'a göre yeni Reels videolarını çeken endpoint
 app.get('/api/reels', async (req, res) => {
     try {
         const nextToken = req.query.token || ''; 
@@ -22,6 +20,7 @@ app.get('/api/reels', async (req, res) => {
             url: 'https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_reels.php',
             headers: {
                 'content-type': 'application/x-www-form-urlencoded',
+                // Baştaki X- harfini büyük/küçük kontrolü için buraya sabitledim
                 'X-RapidAPI-Key': '470a20f40emshd79d5bc169e6302p1afca5jsnec9478b74ac8',
                 'X-RapidAPI-Host': 'instagram-scraper-stable-api.p.rapidapi.com'
             },
@@ -30,14 +29,16 @@ app.get('/api/reels', async (req, res) => {
 
         const response = await axios.request(options);
         
-        // Frontend'in kolayca okuyabilmesi için veriyi sadeleştirip gönderiyoruz
-        res.json({
-            items: response.data.data || response.data.items || [],
-            nextToken: response.data.pagination_token || null 
-        }); 
+        // Eğer API'den veri geldiyse direkt gönderiyoruz
+        res.json(response.data); 
     } catch (error) {
-        console.error("Reels videoları çekilirken sunucu hatası:", error);
-        res.status(500).json({ error: "Videolar yüklenemedi" });
+        // Hata olduğunda sunucu çökmesin, hatayı frontend'e göndersin
+        console.error("Sunucu API Hatası:", error.message);
+        res.status(500).json({ 
+            error: "Instagram API baglantisi basarisiz oldu.", 
+            detay: error.message,
+            response: error.response ? error.response.data : "Cevap yok"
+        });
     }
 });
 
@@ -46,5 +47,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Osgram sunucusu http://localhost:${PORT} üzerinde aktif!`);
+    console.log(`Sunucu aktif!`);
 });
