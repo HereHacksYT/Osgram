@@ -5,31 +5,40 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// SENİN TELEFONUNDA KESİN ÇALIŞAN SUNUCULARDAN ALINAN ENGELSİZ VİDEO HAVUZU
+// SENİN TELEFONUNDA KESİN ÇALIŞAN ALTYAPILARDAN 6'LI REELS HAVUZU
 const REELS_POOL = [
     {
-        video_url: 'https://vjs.zencdn.net/v/oceans.mp4', // 1. Çalışan video
+        video_url: 'https://vjs.zencdn.net/v/oceans.mp4',
         username: 'gezgin_osman',
         caption: 'Okyanusun derinliklerinden harika bir dikey kesit! 🌊🐋 #nature #shorts'
     },
     {
-        video_url: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4', // 2. Çalışan video
+        video_url: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
         username: 'animasyon_dunyasi',
         caption: 'Efsanevi kısa film test yayını başladı! 🎬🔥 #animation'
     },
     {
-        video_url: 'https://media.w3.org/2010/05/bunny/trailer.mp4', // Kesin çalışan 3. video sunucusu (Big Buck Bunny)
+        video_url: 'https://media.w3.org/2010/05/bunny/trailer.mp4',
         username: 'osmanburda',
         caption: 'Doğada eğlenceli maceralar tam gaz devam ediyor! 🐰🥕 #funny #reels'
     },
     {
-        video_url: 'https://media.w3.org/2010/05/video/movie_300.mp4', // Kesin çalışan 4. video sunucusu
+        video_url: 'https://media.w3.org/2010/05/video/movie_300.mp4',
         username: 'sinema_kolik',
         caption: 'Eski günlerin unutulmaz klasiklerinden küçük bir parça 🎥🍿 #nostalji'
+    },
+    {
+        video_url: 'https://vjs.zencdn.net/v/oceans.mp4?v=2', // Farklı parametreyle havuzu büyütüyoruz
+        username: 'deniz_meraklisi',
+        caption: 'Dalgaların ritmi ruhumuzu dinlendiriyor. 🌊☀️ #sea #relax'
+    },
+    {
+        video_url: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4?v=2',
+        username: 'gamer_tayfa',
+        caption: 'Yeni projeler yolda, beklemede kalın! 🎮🚀 #gaming'
     }
 ];
 
-// Diziyi rastgele karıştırmak için Fisher-Yates Algoritması
 function shuffle(array) {
     let currentIndex = array.length, randomIndex;
     while (currentIndex !== 0) {
@@ -41,7 +50,6 @@ function shuffle(array) {
 }
 
 app.get('/api/reels', (req, res) => {
-    // Havuzun kopyasını oluşturup her seferinde tamamen rastgele karıştırıyoruz
     const shuffledReels = shuffle([...REELS_POOL]);
     res.json({
         items: shuffledReels
@@ -53,5 +61,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Sunucu aktif! OsGram %100 çalışan linklerle ayakta.`);
+    console.log(`Sunucu aktif! OsGram tam ekran modunda.`);
 });
