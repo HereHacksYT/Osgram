@@ -4,7 +4,7 @@ const path = require("path");
 
 const app = express();
 
-const API_KEY = "YOUR_API_KEY";
+const API_KEY = "AIzaSyBxbUuZhEbWOaoGeLiNyyCRHDQlvVP-iYQ";
 
 app.use(express.static(path.join(__dirname, "public")));
 
