@@ -12,12 +12,15 @@ app.get("/api/videos", async (req, res) => {
     try {
         const queries = [
             "komik shorts",
-            "komik video",
-            "minecraft türkçe",
-            "roblox türkçe",
-            "gta 5 türkçe",
-            "valorant türkçe",
-            "pubg mobile türkçe"
+            "komik video shorts",
+            "minecraft shorts türkçe",
+            "roblox shorts türkçe",
+            "pubg shorts türkçe",
+            "valorant shorts türkçe",
+            "brawl stars shorts türkçe",
+            "mobil oyun shorts türkçe",
+            "eğlenceli shorts türkçe",
+            "meme shorts türkçe"
         ];
 
         const q = queries[Math.floor(Math.random() * queries.length)];
@@ -29,11 +32,14 @@ app.get("/api/videos", async (req, res) => {
                     key: API_KEY,
                     part: "snippet",
                     type: "video",
-                    videoEmbeddable: true,
-                    maxResults: 10,
                     q,
+                    maxResults: 15,
+                    videoDuration: "short",
+                    videoEmbeddable: true,
                     regionCode: "TR",
-                    relevanceLanguage: "tr"
+                    relevanceLanguage: "tr",
+                    order: "date",
+                    safeSearch: "moderate"
                 }
             }
         );
