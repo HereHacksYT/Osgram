@@ -12,14 +12,14 @@ async function loadReels() {
         const data = await response.json();
         const items = data.items || [];
 
-        container.innerHTML = ''; // Eski kırık tasarımları temizle
+        container.innerHTML = ''; 
 
         items.forEach(item => {
             if (item.video_url) {
                 const card = document.createElement('div');
                 card.className = 'reels-card';
                 
-                // iPhone Safari için zorunlu kılınan tüm oynatma parametreleri eklendi
+                // Başlangıçta sessiz uyarı yazısıyla birlikte ekliyoruz
                 card.innerHTML = `
                     <video 
                         src="${item.video_url}" 
@@ -28,8 +28,9 @@ async function loadReels() {
                         playsinline 
                         webkit-playsinline
                         preload="auto"
-                        style="width: 100%; height: 100%; object-fit: cover; background: #000;"
+                        style="width: 100%; height: 100%; object-fit: cover;"
                     ></video>
+                    <div class="mute-warning">🔇 Ses için 1 kez dokun</div>
                     <div class="reels-overlay">
                         <h3>@${item.username}</h3>
                         <p>${item.caption}</p>
@@ -37,13 +38,21 @@ async function loadReels() {
                 `;
                 
                 const videoElement = card.querySelector('video');
+                const muteTxt = card.querySelector('.mute-warning');
 
-                // Karta dokunulduğunda sesi aç/kapat yapıyoruz (Böylece iPhone engeline takılmıyor)
+                // Karta dokunulduğunda ses durumunu değiştir
                 card.addEventListener('click', function() {
                     if (videoElement.muted) {
-                        videoElement.muted = false; // Sesi aç
+                        videoElement.muted = false; // Sesi aç (iPhone artık izin verir)
+                        muteTxt.innerHTML = "🔊 Ses Açık";
+                        // 1.5 saniye sonra uyarı yazısını tamamen gizle
+                        setTimeout(() => {
+                            muteTxt.style.opacity = '0';
+                        }, 1500);
                     } else {
-                        videoElement.muted = true; // Sessize al
+                        videoElement.muted = true; // Tekrar sessize al
+                        muteTxt.innerHTML = "🔇 Ses Kapatıldı";
+                        muteTxt.style.opacity = '1';
                     }
                 });
 
@@ -66,13 +75,17 @@ function initObserver() {
         entries.forEach(entry => {
             const video = entry.target;
             if (entry.isIntersecting) {
-                // Ekrana geldiği an arkada sessizce kesin başlatıyoruz
-                video.muted = true;
-                video.play().catch(err => console.log("Oynatma bekleniyor:", err));
+                video.muted = true; // Tarayıcı kuralı gereği sessiz başlatmak zorundayız
+                video.play().catch(err => console.log("Oynatılamadı:", err));
             } else {
-                // Ekrandan çıkınca durdur ve başa sar
                 video.pause();
                 video.currentTime = 0;
+                // Kaydırıp gidince üzerindeki ses yazısı görünürlüğünü sıfırla
+                const muteTxt = video.parentElement.querySelector('.mute-warning');
+                if (muteTxt) {
+                    muteTxt.innerHTML = "🔇 Ses için 1 kez dokun";
+                    muteTxt.style.opacity = '1';
+                }
             }
         });
     }, { threshold: 0.6 });
