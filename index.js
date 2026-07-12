@@ -5,15 +5,15 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ASLA ENGELENMEYEN VE SİYAH EKRANDA KALMAYAN YOUTUBE SHORTS HAVUZU
+// HATASIZ YOUTUBE SHORTS HAVUZU
 const REELS_POOL = [
     {
-        youtube_id: 'tPe8bOOn0aE', // Değişik eğlenceli dikey videolar
+        youtube_id: 'tPe8bOOn0aE', 
         username: 'kesif_zamani',
         caption: 'Bu manzaraya karşı kiminle olmak isterdin? 🏔️✨ #shorts #travel'
     },
     {
-        youtube_url: '9YfFv9S63b4',
+        youtube_id: '9YfFv9S63b4', // İŞTE BURADAKİ UFAK HATA DÜZELTİLDİ!
         username: 'oyuncu_osman',
         caption: 'Geleceğin teknolojisi şimdiden hazır! 🎮🔥 #cyberpunk #gaming'
     },
