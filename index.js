@@ -5,34 +5,28 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// HATASIZ YOUTUBE SHORTS HAVUZU
+// İNATÇI MOBİL TARAYICILARIN VE IPHONE'LARIN ASLA ENGELLEYEMEDİĞİ RESMİ AKIŞ VİDEOLARI
 const REELS_POOL = [
     {
-        youtube_id: 'tPe8bOOn0aE', 
-        username: 'kesif_zamani',
-        caption: 'Bu manzaraya karşı kiminle olmak isterdin? 🏔️✨ #shorts #travel'
+        video_url: 'https://demo.unified-streaming.com/kaltura/the-daily-show_short.mp4',
+        username: 'show_dunyasi',
+        caption: 'Günün en eğlenceli anları burada! 🎬😂 #fun #shorts'
     },
     {
-        youtube_id: '9YfFv9S63b4', // İŞTE BURADAKİ UFAK HATA DÜZELTİLDİ!
+        video_url: 'https://bitmovin-a.akamaihd.net/content/playhouse-vr/mp4/video_1000k_10bit_24fps.mp4',
         username: 'oyuncu_osman',
-        caption: 'Geleceğin teknolojisi şimdiden hazır! 🎮🔥 #cyberpunk #gaming'
+        caption: 'Sanal gerçeklik dünyasına ilk adım! 🎮🔥 #vr #gaming'
     },
     {
-        youtube_id: '3_gA_rre7Yg',
-        username: 'lezzet_duragi',
-        caption: 'Hızlı ve pratik efsane tarif! 🥞☕️ #food #cooking'
-    },
-    {
-        youtube_id: 'jNQXAC9IVRw',
-        username: 'teknoloji_merkezi',
-        caption: 'Kurulumu tamamladık, sizce nasıl olmuş? 💻🔥 #setup #pc'
+        video_url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        username: 'kesif_zamani',
+        caption: 'Ateşin muhteşem dansı ve doğanın gücü! 🔥✨ #nature'
     }
 ];
 
 app.get('/api/reels', (req, res) => {
     res.json({
-        items: REELS_POOL,
-        nextToken: "devam-et"
+        items: REELS_POOL
     });
 });
 
@@ -41,5 +35,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Sunucu aktif! OsGram YouTube Shorts modunda.`);
+    console.log(`Sunucu aktif! OsGram stabil modda ayakta.`);
 });
