@@ -6,15 +6,23 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// --- VİDEOLARINI ÇEKMEK İSTEDİĞİN INSTAGRAM HESAP ID'LERİ ---
+// Buraya istediğin kadar hesap ID'si ekleyebilirsin.
+// Şu anki listedekiler: instagram, pubgmobile, fcbarcelona, championsleague
+const TARGET_USERS = ['25025320', '6419572620', '21216027', '183742461'];
+
 app.get('/api/reels', async (req, res) => {
     try {
         const nextCursor = req.query.token || ''; 
+
+        // Her istek atıldığında listeden rastgele bir hesap seçiyoruz
+        const randomUserId = TARGET_USERS[Math.floor(Math.random() * TARGET_USERS.length)];
 
         const options = {
             method: 'GET',
             url: 'https://instagram-scraper2.p.rapidapi.com/user_medias',
             params: {
-                user_id: '25025320', // Instagram resmi hesabının ID'si (Kesin veri döner)
+                user_id: randomUserId, // Rastgele seçilen hesap ID'si buraya gidiyor
                 next_cursor: nextCursor
             },
             headers: {
@@ -26,7 +34,6 @@ app.get('/api/reels', async (req, res) => {
 
         const response = await axios.request(options);
         
-        // Yeni API'nin data yapısına göre verileri frontend'e paslıyoruz
         res.json({
             items: response.data.data || [],
             nextToken: response.data.page_info?.end_cursor || null
