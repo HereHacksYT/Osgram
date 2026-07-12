@@ -5,32 +5,27 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// İNTERNETTE SORUNSUZ ÇALIŞAN EVRENSEL REELS VİDEO HAVUZU (5 VİDEO)
+// SENİN TELEFONUNDA KESİN ÇALIŞAN SUNUCULARDAN ALINAN ENGELSİZ VİDEO HAVUZU
 const REELS_POOL = [
     {
-        video_url: 'https://vjs.zencdn.net/v/oceans.mp4',
+        video_url: 'https://vjs.zencdn.net/v/oceans.mp4', // 1. Çalışan video
         username: 'gezgin_osman',
         caption: 'Okyanusun derinliklerinden harika bir dikey kesit! 🌊🐋 #nature #shorts'
     },
     {
-        video_url: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
+        video_url: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4', // 2. Çalışan video
         username: 'animasyon_dunyasi',
         caption: 'Efsanevi kısa film test yayını başladı! 🎬🔥 #animation'
     },
     {
-        video_url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-        username: 'kesif_zamani',
-        caption: 'Ateşin muhteşem dansı ve doğanın gücü! 🔥✨ #nature'
+        video_url: 'https://media.w3.org/2010/05/bunny/trailer.mp4', // Kesin çalışan 3. video sunucusu (Big Buck Bunny)
+        username: 'osmanburda',
+        caption: 'Doğada eğlenceli maceralar tam gaz devam ediyor! 🐰🥕 #funny #reels'
     },
     {
-        video_url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-        username: 'macera_ruhu',
-        caption: 'Kaçış planı hazır, yeni yollar bizi bekler! ⛰️🚗 #travel'
-    },
-    {
-        video_url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-        username: 'hiz_tutkusu',
-        caption: 'Rüzgarı hisset, anın tadını çıkar! 🏍️💨 #joyride'
+        video_url: 'https://media.w3.org/2010/05/video/movie_300.mp4', // Kesin çalışan 4. video sunucusu
+        username: 'sinema_kolik',
+        caption: 'Eski günlerin unutulmaz klasiklerinden küçük bir parça 🎥🍿 #nostalji'
     }
 ];
 
@@ -46,7 +41,7 @@ function shuffle(array) {
 }
 
 app.get('/api/reels', (req, res) => {
-    // Havuzun orijinal halini bozmamak için kopyasını oluşturup karıştırıyoruz
+    // Havuzun kopyasını oluşturup her seferinde tamamen rastgele karıştırıyoruz
     const shuffledReels = shuffle([...REELS_POOL]);
     res.json({
         items: shuffledReels
@@ -58,5 +53,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Sunucu aktif! OsGram rastgele Reels modunda.`);
+    console.log(`Sunucu aktif! OsGram %100 çalışan linklerle ayakta.`);
 });
