@@ -37,10 +37,11 @@
             position: relative;
             background: #000;
         }
+        /* Yatay videoları bile zorla tam ekran dikey yapan sihirli kod */
         video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important; 
         }
         .reels-overlay {
             position: absolute;
@@ -62,7 +63,6 @@
             line-height: 1.4;
             opacity: 0.9;
         }
-        /* Sağ Üstteki Ses Uyarısı Stili */
         .mute-warning {
             position: absolute;
             top: 20px;
@@ -74,7 +74,7 @@
             font-size: 12px;
             font-weight: bold;
             z-index: 20;
-            pointer-events: none; /* Tıklamayı engellemesin */
+            pointer-events: none;
             transition: opacity 0.3s ease;
             display: flex;
             align-items: center;
@@ -83,10 +83,9 @@
     </style>
 </head>
 <body>
-
     <div class="reels-container">
-        </div>
-
+        <!-- Videolar buraya gelecek -->
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
