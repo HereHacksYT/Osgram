@@ -17,9 +17,17 @@ async function loadReels() {
                 const card = document.createElement('div');
                 card.className = 'reels-card';
                 
-                // iPhone uyumluluğu için controls ve playsinline ekledik
+                // iPhone Safari için zorunlu video parametreleri eklendi
                 card.innerHTML = `
-                    <video src="${item.video_url}" loop muted playsinline controlslist="nodownload" style="background: #000;"></video>
+                    <video 
+                        src="${item.video_url}" 
+                        loop 
+                        muted 
+                        playsinline 
+                        webkit-playsinline
+                        preload="auto"
+                        style="width: 100%; height: 100%; object-fit: cover; background: #000;"
+                    ></video>
                     <div class="reels-overlay">
                         <h3>@${item.username}</h3>
                         <p>${item.caption}</p>
@@ -28,7 +36,7 @@ async function loadReels() {
                 
                 const videoElement = card.querySelector('video');
 
-                // Kullanıcı karta tıkladığında oynat/durdur yapısını garantiye alıyoruz
+                // Ekrana tıklandığında kesin oynatmayı tetikliyoruz
                 card.addEventListener('click', function() {
                     if (videoElement.paused) {
                         videoElement.play().catch(err => console.log("Oynatma hatası:", err));
@@ -56,13 +64,15 @@ function initObserver() {
         entries.forEach(entry => {
             const video = entry.target;
             if (entry.isIntersecting) {
-                // iPhone engeline takılmamak için playsinline ve muted ile oynatmayı tetikliyoruz
                 video.muted = true;
-                const playPromise = video.play();
                 
+                // Tarayıcıya videoyu yüklemesini emrediyoruz
+                video.load(); 
+                
+                const playPromise = video.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(error => {
-                        console.log("iOS otomatik oynatmayı engelledi, tıklama bekleniyor.");
+                        console.log("iOS engelledi, dokunma bekleniyor.");
                     });
                 }
                 
@@ -78,7 +88,7 @@ function initObserver() {
                 video.currentTime = 0;
             }
         });
-    }, { threshold: 0.5 }); // Ekranda %50 görünmesi oynaması için yeterli olsun
+    }, { threshold: 0.5 });
 
     videos.forEach(video => observer.observe(video));
 }
