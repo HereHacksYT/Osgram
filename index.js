@@ -11,8 +11,8 @@ app.get('/api/reels', async (req, res) => {
         const nextToken = req.query.token || ''; 
 
         const encodedParams = new URLSearchParams();
-        // Kesin Reels videosu çekebilmek için aktif popüler bir hesap veriyoruz
-        encodedParams.set('username_or_url', 'pubgmobile');
+        // Test için herkesin erişebileceği en garanti hesabı yazıyoruz
+        encodedParams.set('username_or_url', 'instagram');
         encodedParams.set('amount', '20');
         encodedParams.set('pagination_token', nextToken); 
 
@@ -34,8 +34,13 @@ app.get('/api/reels', async (req, res) => {
             nextToken: response.data.pagination_token || null 
         }); 
     } catch (error) {
-        console.error("Sunucu API Hatası:", error.message);
-        res.status(500).json({ error: "Videolar yuklenemedi." });
+        // Hatanın ne olduğunu anlamak için mesajı frontend'e paslıyoruz
+        let apiHatasi = error.message;
+        if (error.response && error.response.data) {
+            apiHatasi += " - Detay: " + JSON.stringify(error.response.data);
+        }
+        
+        res.status(500).json({ error: apiHatasi });
     }
 });
 
