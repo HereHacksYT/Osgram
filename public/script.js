@@ -17,14 +17,13 @@ async function loadReels() {
                 const card = document.createElement('div');
                 card.className = 'reels-card';
                 
-                // preload="metadata" yaparak videonun ilk karesini tarayıcıya çektiriyoruz
                 card.innerHTML = `
                     <video 
                         src="${item.video_url}" 
                         loop 
                         playsinline 
                         webkit-playsinline
-                        preload="metadata"
+                        preload="auto"
                         style="width: 100%; height: 100%; object-fit: cover;"
                     ></video>
                     <div class="play-button"></div>
@@ -37,19 +36,24 @@ async function loadReels() {
                 const videoElement = card.querySelector('video');
                 const playBtn = card.querySelector('.play-button');
 
-                // Karta dokunulduğunda oynat/durdur yap ve butonu gizle/göster
                 card.addEventListener('click', function() {
                     if (videoElement.paused) {
-                        // Oynatırken sesi açıyoruz (unmute) çünkü artık kullanıcı kendi başlattı!
-                        videoElement.muted = false; 
+                        videoElement.muted = false;
                         videoElement.play()
                             .then(() => {
-                                playBtn.style.opacity = '0'; // Oynarken butonu gizle
+                                playBtn.style.opacity = '0';
                             })
-                            .catch(err => console.log("Oynatma hatası:", err));
+                            .catch(err => {
+                                console.log("Hata:", err);
+                                // Eğer oynatamazsa sessize alıp tekrar dene (iOS için kesin çözüm)
+                                videoElement.muted = true;
+                                videoElement.play().then(() => {
+                                    playBtn.style.opacity = '0';
+                                });
+                            });
                     } else {
                         videoElement.pause();
-                        playBtn.style.opacity = '1'; // Durunca butonu geri getir
+                        playBtn.style.opacity = '1';
                     }
                 });
 
@@ -73,18 +77,15 @@ function initObserver() {
             const video = entry.target;
             const playBtn = video.parentElement.querySelector('.play-button');
             
-            // Eğer kullanıcı videodan uzaklaşırsa (aşağı/yukarı kaydırırsa) videoyu otomatik durdur
             if (!entry.isIntersecting) {
                 video.pause();
                 video.currentTime = 0;
-                if (playBtn) playBtn.style.opacity = '1'; // Butonu tekrar göster
+                if (playBtn) playBtn.style.opacity = '1';
             } else {
-                // Yeni kaydırılan video ekrana geldiğinde direkt durur halde beklesin
                 const allCards = document.querySelectorAll('.reels-card');
                 const currentCard = video.parentElement;
                 const index = Array.from(allCards).indexOf(currentCard);
                 
-                // Sonsuz kaydırma tetikleyicisi
                 if (index >= allCards.length - 2) {
                     loadReels(); 
                 }
