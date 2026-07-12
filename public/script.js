@@ -5,24 +5,18 @@ async function loadReels() {
     isLoading = true;
 
     const container = document.querySelector('.reels-container');
+    if (!container) return;
     
     try {
         const response = await fetch('/api/reels');
         const data = await response.json();
-        
         const items = data.items || [];
-
-        // Yükleniyor yazısı varsa temizle
-        if (container.innerHTML.includes('Yükleniyor')) {
-            container.innerHTML = '';
-        }
 
         items.forEach(item => {
             if (item.video_url) {
                 const card = document.createElement('div');
                 card.className = 'reels-card';
                 
-                // Video HTML etiketlerini eksiksiz ekliyoruz
                 card.innerHTML = `
                     <video src="${item.video_url}" loop muted playsinline></video>
                     <div class="reels-overlay">
@@ -31,7 +25,6 @@ async function loadReels() {
                     </div>
                 `;
                 
-                // Tıklayınca oynat / durdur
                 card.querySelector('video').addEventListener('click', function() {
                     if (this.paused) {
                         this.play();
@@ -47,9 +40,8 @@ async function loadReels() {
         initObserver();
 
     } catch (error) {
-        console.error("Hata oluştu:", error);
+        console.error("Hata:", error);
     } finally {
-        // İŞTE BURASI DÜZELDİ: Kilitlenmeyi önleyen kritik kısım
         isLoading = false;
     }
 }
@@ -65,7 +57,6 @@ function initObserver() {
                 const currentCard = entry.target.parentElement;
                 const index = Array.from(allCards).indexOf(currentCard);
                 
-                // Son 2 videoya gelince yeni videoları yükle
                 if (index >= allCards.length - 2) {
                     loadReels(); 
                 }
