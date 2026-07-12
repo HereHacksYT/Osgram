@@ -13,55 +13,28 @@ async function loadReels() {
         const items = data.items || [];
 
         items.forEach(item => {
-            if (item.video_url) {
-                const card = document.createElement('div');
-                card.className = 'reels-card';
-                
-                card.innerHTML = `
-                    <video 
-                        src="${item.video_url}" 
-                        loop 
-                        playsinline 
-                        webkit-playsinline
-                        preload="auto"
-                        style="width: 100%; height: 100%; object-fit: cover;"
-                    ></video>
-                    <div class="play-button"></div>
-                    <div class="reels-overlay">
-                        <h3>@${item.username}</h3>
-                        <p>${item.caption}</p>
-                    </div>
-                `;
-                
-                const videoElement = card.querySelector('video');
-                const playBtn = card.querySelector('.play-button');
+            // youtube_id varsa çalıştır
+            const videoId = item.youtube_id || 'tPe8bOOn0aE';
+            
+            const card = document.createElement('div');
+            card.className = 'reels-card';
+            
+            // iPhone'da kilitlenmeyen YouTube Player Iframe yapısı
+            card.innerHTML = `
+                <iframe 
+                    src="https://www.youtube.com/embed/${videoId}?autoplay=0&mute=0&controls=0&loop=1&playlist=${videoId}&modestbranding=1&rel=0&playsinline=1"
+                    style="width: 100%; height: 100%; border: none;"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen
+                ></iframe>
+                <div class="reels-overlay">
+                    <h3>@${item.username}</h3>
+                    <p>${item.caption}</p>
+                </div>
+            `;
 
-                card.addEventListener('click', function() {
-                    if (videoElement.paused) {
-                        videoElement.muted = false;
-                        videoElement.play()
-                            .then(() => {
-                                playBtn.style.opacity = '0';
-                            })
-                            .catch(err => {
-                                console.log("Hata:", err);
-                                // Eğer oynatamazsa sessize alıp tekrar dene (iOS için kesin çözüm)
-                                videoElement.muted = true;
-                                videoElement.play().then(() => {
-                                    playBtn.style.opacity = '0';
-                                });
-                            });
-                    } else {
-                        videoElement.pause();
-                        playBtn.style.opacity = '1';
-                    }
-                });
-
-                container.appendChild(card);
-            }
+            container.appendChild(card);
         });
-
-        initObserver();
 
     } catch (error) {
         console.error("Hata:", error);
@@ -70,30 +43,12 @@ async function loadReels() {
     }
 }
 
-function initObserver() {
-    const videos = document.querySelectorAll('video');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            const video = entry.target;
-            const playBtn = video.parentElement.querySelector('.play-button');
-            
-            if (!entry.isIntersecting) {
-                video.pause();
-                video.currentTime = 0;
-                if (playBtn) playBtn.style.opacity = '1';
-            } else {
-                const allCards = document.querySelectorAll('.reels-card');
-                const currentCard = video.parentElement;
-                const index = Array.from(allCards).indexOf(currentCard);
-                
-                if (index >= allCards.length - 2) {
-                    loadReels(); 
-                }
-            }
-        });
-    }, { threshold: 0.5 });
-
-    videos.forEach(video => observer.observe(video));
-}
-
+// Sayfa ilk açıldığında yükle
 window.addEventListener('DOMContentLoaded', loadReels);
+
+// Aşağı kaydırdıkça yeni videolar ekleme (Sonsuz kaydırma)
+document.querySelector('.reels-container').addEventListener('scroll', function() {
+    if ((this.scrollTop + this.clientHeight) >= this.scrollHeight - 500) {
+        loadReels();
+    }
+});
