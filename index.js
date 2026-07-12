@@ -5,40 +5,16 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// SENİN TELEFONUNDA KESİN ÇALIŞAN ALTYAPILARDAN 6'LI REELS HAVUZU
+// WEB SİTENDE DOĞRUDAN OYNATILABİLEN YOUTUBE SHORTS/VİDEO HAVUZU
 const REELS_POOL = [
-    {
-        video_url: 'https://vjs.zencdn.net/v/oceans.mp4',
-        username: 'gezgin_osman',
-        caption: 'Okyanusun derinliklerinden harika bir dikey kesit! 🌊🐋 #nature #shorts'
-    },
-    {
-        video_url: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
-        username: 'animasyon_dunyasi',
-        caption: 'Efsanevi kısa film test yayını başladı! 🎬🔥 #animation'
-    },
-    {
-        video_url: 'https://media.w3.org/2010/05/bunny/trailer.mp4',
-        username: 'osmanburda',
-        caption: 'Doğada eğlenceli maceralar tam gaz devam ediyor! 🐰🥕 #funny #reels'
-    },
-    {
-        video_url: 'https://media.w3.org/2010/05/video/movie_300.mp4',
-        username: 'sinema_kolik',
-        caption: 'Eski günlerin unutulmaz klasiklerinden küçük bir parça 🎥🍿 #nostalji'
-    },
-    {
-        video_url: 'https://vjs.zencdn.net/v/oceans.mp4?v=2', // Farklı parametreyle havuzu büyütüyoruz
-        username: 'deniz_meraklisi',
-        caption: 'Dalgaların ritmi ruhumuzu dinlendiriyor. 🌊☀️ #sea #relax'
-    },
-    {
-        video_url: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4?v=2',
-        username: 'gamer_tayfa',
-        caption: 'Yeni projeler yolda, beklemede kalın! 🎮🚀 #gaming'
-    }
+    { youtube_id: 'tPe8bOOn0aE', username: 'kesif_zamani', caption: 'Muhteşem doğa manzarası! 🏔️✨ #shorts #travel' },
+    { youtube_id: '9YfFv9S63b4', username: 'oyuncu_osman', caption: 'Geleceğin teknolojisi ve oyunlar! 🎮🔥 #gaming' },
+    { youtube_id: '3_gA_rre7Yg', username: 'lezzet_duragi', caption: 'Hızlı ve pratik efsane tarif! 🥞☕️ #food' },
+    { youtube_id: 'jNQXAC9IVRw', username: 'teknoloji_merkezi', caption: 'Yeni setup kurulumu bitti! 💻🚀 #setup' },
+    { youtube_id: 'ScMzIvxBSi4', username: 'eglence_adresi', caption: 'Günün en komik anları! 😂 test yayını #fun' }
 ];
 
+// Fisher-Yates Karıştırma Algoritması
 function shuffle(array) {
     let currentIndex = array.length, randomIndex;
     while (currentIndex !== 0) {
@@ -51,9 +27,7 @@ function shuffle(array) {
 
 app.get('/api/reels', (req, res) => {
     const shuffledReels = shuffle([...REELS_POOL]);
-    res.json({
-        items: shuffledReels
-    });
+    res.json({ items: shuffledReels });
 });
 
 app.get('/', (req, res) => {
@@ -61,5 +35,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Sunucu aktif! OsGram tam ekran modunda.`);
+    console.log(`Sunucu aktif! OsGram YouTube gömülü modda.`);
 });
