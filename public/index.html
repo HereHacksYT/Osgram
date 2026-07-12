@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Osgram - Reels</title>
+    <title>OsGram - Reels</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,14 +12,13 @@
         }
         body {
             background-color: #000;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             overflow: hidden;
         }
-        /* Reels'ları alt alta çıt çıt kitleyen konteyner */
         .reels-container {
             width: 100%;
             max-width: 450px; 
@@ -29,7 +28,7 @@
             scrollbar-width: none; 
         }
         .reels-container::-webkit-scrollbar {
-            display: none; /* Kaydırma çubuğunu gizler */
+            display: none;
         }
         .reels-card {
             width: 100%;
@@ -41,16 +40,15 @@
         video {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Videonun ekranı tam kaplamasını sağlar */
+            object-fit: cover;
         }
-        /* Alt kısımdaki kullanıcı adı ve açıklama alanı */
         .reels-overlay {
             position: absolute;
             bottom: 50px;
             left: 15px;
             right: 70px;
             color: white;
-            text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
             z-index: 10;
         }
         .reels-overlay h3 {
@@ -63,12 +61,19 @@
             line-height: 1.4;
             opacity: 0.9;
         }
+        .loading-text {
+            color: white;
+            text-align: center;
+            padding-top: 50px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
 
     <div class="reels-container">
-        </div>
+        <p class="loading-text">OsGram Reels Yükleniyor...</p>
+    </div>
 
     <script src="script.js"></script>
 </body>
