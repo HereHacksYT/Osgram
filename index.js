@@ -1,12 +1,21 @@
+const express = require('express');
+const path = require('path');
+const axios = require('axios');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// public klasöründeki HTML, CSS ve JS dosyalarını dışarıya açıyoruz
+app.use(express.static(path.join(__dirname, 'public')));
+
+// İnternetten gelen token'a göre yeni Reels videolarını çeken endpoint
 app.get('/api/reels', async (req, res) => {
     try {
-        // Tarayıcıdan bir sonraki sayfa token'ı gelmiş mi diye bakıyoruz
         const nextToken = req.query.token || ''; 
 
         const encodedParams = new URLSearchParams();
         encodedParams.set('username_or_url', 'quran');
         encodedParams.set('amount', '20');
-        encodedParams.set('pagination_token', nextToken); // Token'ı buraya besliyoruz
+        encodedParams.set('pagination_token', nextToken); 
 
         const options = {
             method: 'POST',
@@ -21,14 +30,21 @@ app.get('/api/reels', async (req, res) => {
 
         const response = await axios.request(options);
         
-        // Hem videoları hem de bir sonraki sayfanın token'ını frontend'e gönderiyoruz
+        // Frontend'in kolayca okuyabilmesi için veriyi sadeleştirip gönderiyoruz
         res.json({
             items: response.data.data || response.data.items || [],
-            // API'den dönen yeni token'ın yerini kontrol et (genellikle next_page_token veya pagination_token olur)
             nextToken: response.data.pagination_token || null 
         }); 
     } catch (error) {
-        console.error("Hata:", error);
+        console.error("Reels videoları çekilirken sunucu hatası:", error);
         res.status(500).json({ error: "Videolar yüklenemedi" });
     }
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.listen(PORT, () => {
+    console.log(`Osgram sunucusu http://localhost:${PORT} üzerinde aktif!`);
 });
