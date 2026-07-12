@@ -1,47 +1,40 @@
 const express = require('express');
 const path = require('path');
-const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- VİDEOLARINI ÇEKMEK İSTEDİĞİN INSTAGRAM HESAP ID'LERİ ---
-// Buraya istediğin kadar hesap ID'si ekleyebilirsin.
-// Şu anki listedekiler: instagram, pubgmobile, fcbarcelona, championsleague
-const TARGET_USERS = ['25025320', '6419572620', '21216027', '183742461'];
-
-app.get('/api/reels', async (req, res) => {
-    try {
-        const nextCursor = req.query.token || ''; 
-
-        // Her istek atıldığında listeden rastgele bir hesap seçiyoruz
-        const randomUserId = TARGET_USERS[Math.floor(Math.random() * TARGET_USERS.length)];
-
-        const options = {
-            method: 'GET',
-            url: 'https://instagram-scraper2.p.rapidapi.com/user_medias',
-            params: {
-                user_id: randomUserId, // Rastgele seçilen hesap ID'si buraya gidiyor
-                next_cursor: nextCursor
-            },
-            headers: {
-                'x-rapidapi-key': '470a20f40emshd79d5bc169e6302p1afca5jsnec9478b74ac8',
-                'x-rapidapi-host': 'instagram-scraper2.p.rapidapi.com',
-                'Content-Type': 'application/json'
-            }
-        };
-
-        const response = await axios.request(options);
-        
-        res.json({
-            items: response.data.data || [],
-            nextToken: response.data.page_info?.end_cursor || null
-        }); 
-    } catch (error) {
-        console.error("Sunucu API Hatası:", error.message);
-        res.status(500).json({ error: "Videolar yuklenemedi." });
+// Kesintisiz, kota sınırı olmayan harika dikey dikey Reels test videoları havuzu
+const REELS_POOL = [
+    {
+        video_url: 'https://player.vimeo.com/external/371433846.sd.mp4?s=236da2f3c05d043d15d5d994eaae6c3c7e09cbcc&profile_id=165&oauth2_token_id=57447761',
+        username: 'dogasever',
+        caption: 'Doğanın huzuru ve muhteşem akarsular 🌲✨ #nature #shorts'
+    },
+    {
+        video_url: 'https://player.vimeo.com/external/434045526.sd.mp4?s=c1b24d8fbfbb4af2f0ccad2ee5d60df64db0c3d9&profile_id=165&oauth2_token_id=57447761',
+        username: 'oyuncu_osman',
+        caption: 'Cyberpunk esintili sokaklar ve harika dikey çekim! 🎮🔥 #cyberpunk #neon'
+    },
+    {
+        video_url: 'https://player.vimeo.com/external/403816912.sd.mp4?s=784c2bc02e6a9ee82b8a7db3ee1509fa8454238b&profile_id=165&oauth2_token_id=57447761',
+        username: 'lezzet_dunyasi',
+        caption: 'Sabah kahvesini böyle hazırlayanlar burada mı? ☕️🥞 #coffee #morning'
+    },
+    {
+        video_url: 'https://player.vimeo.com/external/538964283.sd.mp4?s=6a63442491a13b652875151b14a938c20164e292&profile_id=165&oauth2_token_id=57447761',
+        username: 'gegin_rotasi',
+        caption: 'Bulutların üzerindeki muhteşem dağ manzarası ☁️⛰️ #travel #reels'
     }
+];
+
+app.get('/api/reels', (req, res) => {
+    // Sayfa aşağı kaydırıldıkça döngüye girip videoları sonsuza kadar döndürmek için
+    res.json({
+        items: REELS_POOL,
+        nextToken: "devam-et" // Sonsuz kaydırmayı tetikleyecek sahte token
+    });
 });
 
 app.get('/', (req, res) => {
@@ -49,5 +42,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Sunucu aktif!`);
+    console.log(`Sunucu aktif! OsGram ayakta.`);
 });
