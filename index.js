@@ -8,39 +8,32 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/reels', async (req, res) => {
     try {
-        const nextToken = req.query.token || ''; 
-
-        const encodedParams = new URLSearchParams();
-        // Test için herkesin erişebileceği en garanti hesabı yazıyoruz
-        encodedParams.set('username_or_url', 'instagram');
-        encodedParams.set('amount', '20');
-        encodedParams.set('pagination_token', nextToken); 
+        const nextCursor = req.query.token || ''; 
 
         const options = {
-            method: 'POST',
-            url: 'https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_reels.php',
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded',
-                'X-RapidAPI-Key': '470a20f40emshd79d5bc169e6302p1afca5jsnec9478b74ac8',
-                'X-RapidAPI-Host': 'instagram-scraper-stable-api.p.rapidapi.com'
+            method: 'GET',
+            url: 'https://instagram-scraper2.p.rapidapi.com/user_medias',
+            params: {
+                user_id: '25025320', // Instagram resmi hesabının ID'si (Kesin veri döner)
+                next_cursor: nextCursor
             },
-            data: encodedParams
+            headers: {
+                'x-rapidapi-key': '470a20f40emshd79d5bc169e6302p1afca5jsnec9478b74ac8',
+                'x-rapidapi-host': 'instagram-scraper2.p.rapidapi.com',
+                'Content-Type': 'application/json'
+            }
         };
 
         const response = await axios.request(options);
         
+        // Yeni API'nin data yapısına göre verileri frontend'e paslıyoruz
         res.json({
-            items: response.data.data || response.data.items || [],
-            nextToken: response.data.pagination_token || null 
+            items: response.data.data || [],
+            nextToken: response.data.page_info?.end_cursor || null
         }); 
     } catch (error) {
-        // Hatanın ne olduğunu anlamak için mesajı frontend'e paslıyoruz
-        let apiHatasi = error.message;
-        if (error.response && error.response.data) {
-            apiHatasi += " - Detay: " + JSON.stringify(error.response.data);
-        }
-        
-        res.status(500).json({ error: apiHatasi });
+        console.error("Sunucu API Hatası:", error.message);
+        res.status(500).json({ error: "Videolar yuklenemedi." });
     }
 });
 
