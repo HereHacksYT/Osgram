@@ -1,83 +1,17 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OsGram - Reels</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            background-color: #000;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .reels-container {
-            width: 100%;
-            max-width: 450px; 
-            height: 100vh;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            scrollbar-width: none; 
-        }
-        .reels-container::-webkit-scrollbar {
-            display: none;
-        }
-        .reels-card {
-            width: 100%;
-            height: 100vh;
-            scroll-snap-align: start;
-            position: relative;
-            background: #000;
-            overflow: hidden;
-        }
-        /* Videoları zorla dikey yapan ve sığdıran iframe stili */
-        .iframe-wrapper {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            pointer-events: auto; /* Tıklayıp YouTube butonuna basabilmen için */
-        }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            object-fit: cover;
-        }
-        .reels-overlay {
-            position: absolute;
-            bottom: 40px;
-            left: 15px;
-            right: 15px;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
-            z-index: 99;
-            pointer-events: none; /* Yazılar tıklamayı engellemesin */
-            background: linear-gradient(transparent, rgba(0,0,0,0.5));
-            padding: 10px;
-            border-radius: 8px;
-        }
-        .reels-overlay h3 {
-            font-size: 16px;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        .reels-overlay p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
+        body, html { margin:0; padding:0; background:#000; overflow:hidden; }
+        .reels-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
+        .card { height: 100vh; scroll-snap-align: start; position: relative; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        .info { position: absolute; bottom: 20px; left: 10px; color: #fff; font-family: sans-serif; }
     </style>
 </head>
 <body>
-    <div class="reels-container">
-        </div>
+    <div class="reels-container" id="container"></div>
     <script src="script.js"></script>
 </body>
 </html>
