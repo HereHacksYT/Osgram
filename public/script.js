@@ -12,29 +12,46 @@ async function loadReels() {
         const data = await response.json();
         const items = data.items || [];
 
-        items.forEach(item => {
-            // youtube_id varsa çalıştır
-            const videoId = item.youtube_id || 'tPe8bOOn0aE';
-            
-            const card = document.createElement('div');
-            card.className = 'reels-card';
-            
-            // iPhone'da kilitlenmeyen YouTube Player Iframe yapısı
-            card.innerHTML = `
-                <iframe 
-                    src="https://www.youtube.com/embed/${videoId}?autoplay=0&mute=0&controls=0&loop=1&playlist=${videoId}&modestbranding=1&rel=0&playsinline=1"
-                    style="width: 100%; height: 100%; border: none;"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                    allowfullscreen
-                ></iframe>
-                <div class="reels-overlay">
-                    <h3>@${item.username}</h3>
-                    <p>${item.caption}</p>
-                </div>
-            `;
+        container.innerHTML = ''; // Eski kırık tasarımları temizle
 
-            container.appendChild(card);
+        items.forEach(item => {
+            if (item.video_url) {
+                const card = document.createElement('div');
+                card.className = 'reels-card';
+                
+                // iPhone Safari için zorunlu kılınan tüm oynatma parametreleri eklendi
+                card.innerHTML = `
+                    <video 
+                        src="${item.video_url}" 
+                        loop 
+                        muted 
+                        playsinline 
+                        webkit-playsinline
+                        preload="auto"
+                        style="width: 100%; height: 100%; object-fit: cover; background: #000;"
+                    ></video>
+                    <div class="reels-overlay">
+                        <h3>@${item.username}</h3>
+                        <p>${item.caption}</p>
+                    </div>
+                `;
+                
+                const videoElement = card.querySelector('video');
+
+                // Karta dokunulduğunda sesi aç/kapat yapıyoruz (Böylece iPhone engeline takılmıyor)
+                card.addEventListener('click', function() {
+                    if (videoElement.muted) {
+                        videoElement.muted = false; // Sesi aç
+                    } else {
+                        videoElement.muted = true; // Sessize al
+                    }
+                });
+
+                container.appendChild(card);
+            }
         });
+
+        initObserver();
 
     } catch (error) {
         console.error("Hata:", error);
@@ -43,12 +60,24 @@ async function loadReels() {
     }
 }
 
-// Sayfa ilk açıldığında yükle
-window.addEventListener('DOMContentLoaded', loadReels);
+function initObserver() {
+    const videos = document.querySelectorAll('video');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const video = entry.target;
+            if (entry.isIntersecting) {
+                // Ekrana geldiği an arkada sessizce kesin başlatıyoruz
+                video.muted = true;
+                video.play().catch(err => console.log("Oynatma bekleniyor:", err));
+            } else {
+                // Ekrandan çıkınca durdur ve başa sar
+                video.pause();
+                video.currentTime = 0;
+            }
+        });
+    }, { threshold: 0.6 });
 
-// Aşağı kaydırdıkça yeni videolar ekleme (Sonsuz kaydırma)
-document.querySelector('.reels-container').addEventListener('scroll', function() {
-    if ((this.scrollTop + this.clientHeight) >= this.scrollHeight - 500) {
-        loadReels();
-    }
-});
+    videos.forEach(video => observer.observe(video));
+}
+
+window.addEventListener('DOMContentLoaded', loadReels);
