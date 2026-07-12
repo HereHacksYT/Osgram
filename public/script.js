@@ -1,4 +1,3 @@
-let currentToken = ''; 
 let isLoading = false;  
 
 async function loadReels() {
@@ -8,48 +7,31 @@ async function loadReels() {
     const container = document.querySelector('.reels-container');
     
     try {
-        const response = await fetch(`/api/reels?token=${currentToken}`);
+        const response = await fetch('/api/reels');
         const data = await response.json();
         
         const items = data.items || [];
-        currentToken = data.nextToken; 
 
-        if (items.length === 0 && currentToken) {
-            isLoading = false; 
-            loadReels(); 
-            return;
-        }
-
-        if (items.length === 0 && !currentToken) {
-            if(container.children.length === 0 || container.innerHTML.includes('Yükleniyor')) {
-                container.innerHTML = "<p style='color:white; text-align:center; padding-top:50px;'>Hiç video bulunamadı.</p>";
-            }
-            return;
-        }
-
+        // Yükleniyor yazısı varsa temizle
         if (container.innerHTML.includes('Yükleniyor')) {
             container.innerHTML = '';
         }
 
         items.forEach(item => {
-            // Yeni API'deki tüm video ihtimallerini kontrol ediyoruz (Reels kontrolü)
-            const videoUrl = item.video_url || 
-                             (item.video_versions && item.video_versions[0]?.url) || 
-                             item.clips_metadata?.video_url;
-            
-            // Sadece video olan içerikleri ekrana basıyoruz (Fotoğrafları eliyoruz)
-            if (videoUrl) {
+            if (item.video_url) {
                 const card = document.createElement('div');
                 card.className = 'reels-card';
                 
+                // Video HTML etiketlerini eksiksiz ekliyoruz
                 card.innerHTML = `
-                    <video src="${videoUrl}" loop muted playsinline></video>
+                    <video src="${item.video_url}" loop muted playsinline></video>
                     <div class="reels-overlay">
-                        <h3>@${item.user?.username || 'instagram_user'}</h3>
-                        <p>${item.caption?.text || ''}</p>
+                        <h3>@${item.username}</h3>
+                        <p>${item.caption}</p>
                     </div>
                 `;
                 
+                // Tıklayınca oynat / durdur
                 card.querySelector('video').addEventListener('click', function() {
                     if (this.paused) {
                         this.play();
@@ -65,8 +47,9 @@ async function loadReels() {
         initObserver();
 
     } catch (error) {
-        container.innerHTML = `<p style='color:orange; text-align:center; padding-top:50px;'>Bağlantı Hatası: ${error.message}</p>`;
+        console.error("Hata oluştu:", error);
     } finally {
+        // İŞTE BURASI DÜZELDİ: Kilitlenmeyi önleyen kritik kısım
         isLoading = false;
     }
 }
@@ -76,13 +59,14 @@ function initObserver() {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.play().catch(err => console.log("Otomatik oynatma engellendi:", err));
+                entry.target.play().catch(err => console.log("Oynatma engellendi:", err));
                 
                 const allCards = document.querySelectorAll('.reels-card');
                 const currentCard = entry.target.parentElement;
                 const index = Array.from(allCards).indexOf(currentCard);
                 
-                if (index >= allCards.length - 3 && currentToken) {
+                // Son 2 videoya gelince yeni videoları yükle
+                if (index >= allCards.length - 2) {
                     loadReels(); 
                 }
             } else {
